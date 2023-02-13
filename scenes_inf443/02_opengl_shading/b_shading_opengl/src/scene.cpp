@@ -101,12 +101,7 @@ void scene_structure::display_frame()
 	sphere_light.material.phong.specular = 0;
 	draw(sphere_light, environment);
 
-	environment.uniform_generic.uniform_float["diffuse"] = gui.diffuse;
-	environment.uniform_generic.uniform_float["specular"] = gui.specular;
-	environment.uniform_generic.uniform_float["specular_exp"] = gui.specular_exp;
 
-	environment.uniform_generic.uniform_vec3["fog_color"] = gui.fog_color;
-	environment.background_color = gui.fog_color;
 
 	
 	// conditional display of the global frame (set via the GUI)
@@ -141,10 +136,6 @@ void scene_structure::display_gui()
 	ImGui::SliderFloat3("Light position", &gui.light_position[0], -3.0f, 3.0f);
 
 	ImGui::SliderFloat("Ambiant", &gui.ambiant, 0.0f, 1.0f);
-	ImGui::SliderFloat("Diffuse", &gui.diffuse, 0.0f, 1.0f);
-	ImGui::SliderFloat("Specular", &gui.specular, 0.0f, 1.0f);
-	ImGui::SliderFloat("Specular Exp.", &gui.specular_exp, 0.1f, 256.0f, "%.3f", 2);
-	ImGui::ColorEdit3("Fog color", &gui.fog_color[0]);
 }
 
 void scene_structure::mouse_move_event()

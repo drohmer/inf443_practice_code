@@ -1,6 +1,5 @@
 #pragma once
 
-#undef SOLUTION
 
 #include "cgp/cgp.hpp"
 #include "environment.hpp"
@@ -19,11 +18,8 @@ struct gui_parameters {
 
 	vec3 light_color = { 1,1,1 };
 	vec3 light_position = { -2, 2, 2 };
-	float specular = 0.6f;
-	float specular_exp = 64.0f;
-	vec3 fog_color = { 0.4f, 0.4f, 0.4f };
+
 	float ambiant = 1.0f;
-	float diffuse = 0.8f;
 };
 
 // The structure of the custom scene
