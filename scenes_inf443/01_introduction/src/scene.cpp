@@ -9,6 +9,8 @@ using namespace cgp;
 // This function can contain any complex operation that can be pre-computed once
 void scene_structure::initialize()
 {
+	std::cout << "Start function scene_structure::initialize()" << std::endl;
+
 	// Set the behavior of the camera and its initial position
 	// ********************************************** //
 	camera_control.initialize(inputs, window); 
@@ -50,8 +52,11 @@ void scene_structure::initialize()
 		{  L_ground,  L_ground, z_ground },
 		{ -L_ground,  L_ground, z_ground });
 	ground.initialize_data_on_gpu(ground_mesh);
-	ground.texture.load_and_initialize_texture_2d_on_gpu("assets/checkboard.png");
+	ground.texture.load_and_initialize_texture_2d_on_gpu(project::path+"assets/checkboard.png");
 
+
+
+	std::cout << "End function scene_structure::initialize()" << std::endl;
 
 }
 
@@ -61,8 +66,12 @@ void scene_structure::initialize()
 void scene_structure::display_frame()
 {
 
+
 	// Set the light to the current position of the camera
 	environment.light = camera_control.camera_model.position();
+
+	// Update time
+	timer.update();
 	
 	// the general syntax to display a mesh is:
 	//   draw(mesh_drawableName, environment);
@@ -70,9 +79,11 @@ void scene_structure::display_frame()
 	draw(ground, environment);
 	draw(cube, environment);	
 
+
 	// conditional display of the global frame (set via the GUI)
 	if (gui.display_frame)
 		draw(global_frame, environment);
+
 
 
 
@@ -81,7 +92,6 @@ void scene_structure::display_frame()
 void scene_structure::display_gui()
 {
 	ImGui::Checkbox("Frame", &gui.display_frame);
-	ImGui::Checkbox("Wireframe", &gui.display_wireframe);
 }
 
 void scene_structure::mouse_move_event()

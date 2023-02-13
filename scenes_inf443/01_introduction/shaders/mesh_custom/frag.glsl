@@ -35,6 +35,7 @@ uniform mat4 view;       // View matrix (rigid transform) of the camera - to com
 uniform vec3 light; // position of the light
 
 
+
 // Coefficients of phong illumination model
 struct phong_structure {
 	float ambient;      
@@ -126,7 +127,5 @@ void main()
 	
 	// Output color, with the alpha component
 	FragColor = vec4(color_shading, material.alpha * color_image_texture.a);
-
-
 
 }
