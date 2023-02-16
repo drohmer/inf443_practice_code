@@ -1,10 +1,10 @@
-# This Makefile will generate an executable file named b_shading_opengl
+# This Makefile will generate an executable file named 02b_opengl_shading
 
 # This path should point to the CGP library depending on the current directory
 ## You may need to it in case you move the position of your directory
-PATH_TO_CGP = ../../../cgp/library/
+PATH_TO_CGP = ../../cgp/library/
 
-TARGET ?= b_shading_opengl #name of the executable
+TARGET ?= 02b_opengl_shading #name of the executable
 SRC_DIRS ?= src/ $(PATH_TO_CGP)
 CXX = g++ #Or clang++
 

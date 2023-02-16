@@ -1,267 +1,128 @@
+// OpenGL Loader - GLAD should be included before GLFW
+// GLAD: https://github.com/Dav1dde/glad
+// GLAD files generated from https://glad.dav1d.de/
+#include "../third_party/src/glad/include/glad/glad.hpp"
 
+// Include GLFW
+#include <GLFW/glfw3.h>
 
-#include "cgp/cgp.hpp" // Give access to the complete CGP library
-#include "environment.hpp" // The general scene environment + project variable
+// Update GLFW variables for some system
+#ifndef GLFW_TRUE
+#define GLFW_TRUE 1
+#define GLFW_FALSE 0
+#endif
+
 #include <iostream> 
+#include <cmath>
 
 
 
-// Custom scene of this code
-#include "scene.hpp"
-
-
-
-
-// *************************** //
-// Custom Scene defined in "scene.hpp"
-// *************************** //
-
-scene_structure scene;
-
-
-// The rest of this code is a generic initialization and animation loop that can be applied to different scenes
-// *************************** //
-// Start of the program
-// *************************** //
-
-window_structure standard_window_initialization(int width = 0, int height = 0);
-void initialize_default_shaders();
-void animation_loop();
-
-timer_fps fps_record;
+GLFWwindow* create_window_using_glfw();
+void glfw_error_callback(int error, const char* description);
 
 int main(int, char* argv[])
 {
+	// Debug message (name of the program)
 	std::cout << "Run " << argv[0] << std::endl;
 
-	
 
-	// ************************ //
-	//     INITIALISATION
-	// ************************ //
-
-	// Standard Initialization of an OpenGL ready window
-	scene.window = standard_window_initialization();
-
-	// Initialize System Info
-	project::path = cgp::project_path_find(argv[0], "shaders/");
-
-	// Initialize default shaders
-	initialize_default_shaders();
+	// Create the window using GLFW
+	GLFWwindow* window = create_window_using_glfw();
 
 
-	// Custom scene initialization
-	std::cout << "Initialize data of the scene ..." << std::endl;
-	scene.initialize();
-	std::cout << "Initialization finished\n" << std::endl;
+	// Display loop
+	std::cout << "\nStart display loop ..." << std::endl;
+	while (!glfwWindowShouldClose(window)) // loop as long as the window is not closed
+	{
+		// Set here the color used to clear the window at each frame
+		glClearColor(0.8f, 0.6f, 0.5f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-
-	// ************************ //
-	//     Animation Loop
-	// ************************ //
-	std::cout << "Start animation loop ..." << std::endl;
-	fps_record.start();
-
-
-	// Call the main display loop in the function animation_loop
-	//  The following part is simply a loop that call the function "animation_loop"
-	//  (This call is different when we compile in standard mode with GLFW, than when we compile with emscripten to output the result in a webpage.)
-#ifndef __EMSCRIPTEN__
-	// Default mode to run the animation/display loop with GLFW in C++
-	while (!glfwWindowShouldClose(scene.window.glfw_window)) {
-		animation_loop();
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
-#else
-	// Specific loop if compiled for EMScripten
-	emscripten_set_main_loop(animation_loop, 0, 1);
-#endif
 
-	std::cout << "\nAnimation loop stopped" << std::endl;
-
+		
 	// Cleanup
-	cgp::imgui_cleanup();
-	glfwDestroyWindow(scene.window.glfw_window);
+	glfwDestroyWindow(window);
 	glfwTerminate();
 
 	return 0;
 }
 
-void animation_loop()
+
+GLFWwindow* create_window_using_glfw()
 {
+	// Set GLFW callback to catch and display error
+	glfwSetErrorCallback(glfw_error_callback);
 
-	emscripten_update_window_size(scene.window.width, scene.window.height); // update window size in case of use of emscripten (not used by default)
-
-	scene.camera_projection.aspect_ratio = scene.window.aspect_ratio();
-	scene.environment.camera_projection = scene.camera_projection.matrix();
-	glViewport(0, 0, scene.window.width, scene.window.height);
-
-	vec3 const& background_color = scene.environment.background_color;
-	glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-
-	float const time_interval = fps_record.update();
-	if (fps_record.event) {
-		std::string const title = "CGP Display - " + str(fps_record.fps) + " fps";
-		glfwSetWindowTitle(scene.window.glfw_window, title.c_str());
+	// Initialize GLFW
+	int const glfw_init_value = glfwInit();
+	if (glfw_init_value != GLFW_TRUE) {
+		std::string s = "\nError: Failed to Initialize GLFW.\n";
+		abort();
 	}
 
-	imgui_create_frame();
-	ImGui::GetIO().FontGlobalScale = project::gui_scale;
-	ImGui::Begin("GUI", NULL, ImGuiWindowFlags_AlwaysAutoResize);
-	scene.inputs.mouse.on_gui = ImGui::GetIO().WantCaptureMouse;
-	scene.inputs.time_interval = time_interval;
+	// Set GLFW parameter before creating the window
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API); // change to GLFW_OPENGL_ES_API for WebGL
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Use only modern OpenGL
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Expect OpenGL 3.3 or greater
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE); // Required for MacOS
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);  // Allow possible debug
+
+	glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE); // Take focus when created
+	glfwWindowHint(GLFW_SAMPLES, 8); // Multisampling
+	glfwWindowHint(GLFW_FLOATING, GLFW_FALSE); // Windows is not always on top
+
+#ifdef __APPLE__
+	glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE); // To avoid HiDPI issues with pixel size on Mac
+#endif 
 
 
-	// Display the ImGUI interface (button, sliders, etc)
-	scene.display_gui();
+	// Create a window taking 1/4 of your window size
+	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	int const width = mode->width / 4;
+	int const height = mode->height / 4;
+	
+	// Actual creation of the window
+	GLFWwindow* window = glfwCreateWindow(width, height, "GLFW Window", nullptr, nullptr);
 
-	// Handle camera behavior in standard frame
-	scene.idle_frame();
-
-	// Call the display of the scene
-	scene.display_frame();
-
-
-	// End of ImGui display and handle GLFW events
-	ImGui::End();
-	imgui_render_frame(scene.window.glfw_window);
-	glfwSwapBuffers(scene.window.glfw_window);
-	glfwPollEvents();
-}
+	// Check that the window is created
+	if (window == nullptr) {
+		std::cerr << "Failed to create GLFW Window" << std::endl;
+		abort();
+	}
+	std::cout << "\nSuccessfully created a window of size " << width << " x " << height << std::endl;
 
 
-void initialize_default_shaders()
-{
-	// Generate the default directory from which the shaders are found
-	//  By default, it should be "shaders/"
-	std::string default_path_shaders = project::path +"shaders/";
+	// Set an OpenGL context for this window
+	glfwMakeContextCurrent(window);
 
-	// Set standard mesh shader for mesh_drawable
-	mesh_drawable::default_shader.load(default_path_shaders +"mesh/vert.glsl", default_path_shaders +"mesh/frag.glsl");
-	triangles_drawable::default_shader.load(default_path_shaders +"mesh/vert.glsl", default_path_shaders +"mesh/frag.glsl");
-
-	// Set default white texture
-	image_structure const white_image = image_structure{ 1,1,image_color_type::rgba,{255,255,255,255} };
-	mesh_drawable::default_texture.initialize_texture_2d_on_gpu(white_image);
-	triangles_drawable::default_texture.initialize_texture_2d_on_gpu(white_image);
-
-	// Set standard uniform color for curve/segment_drawable
-	curve_drawable::default_shader.load(default_path_shaders +"single_color/vert.glsl", default_path_shaders+"single_color/frag.glsl");
-}
-
-
-
-
-
-//Callback functions
-void window_size_callback(GLFWwindow* window, int width, int height);
-void mouse_move_callback(GLFWwindow* window, double xpos, double ypos);
-void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void mouse_click_callback(GLFWwindow* window, int button, int action, int mods);
-void keyboard_callback(GLFWwindow* window, int key, int, int action, int mods);
-
-// Standard initialization procedure
-window_structure standard_window_initialization(int width_target, int height_target)
-{
-	// Create the window using GLFW
-	// ***************************************************** //
-	window_structure window;
-	window.initialize(width_target, height_target, "CGP Display", CGP_OPENGL_VERSION_MAJOR, CGP_OPENGL_VERSION_MINOR);
-
-	// Display information
-	// ***************************************************** //
-
-	// Display window size
-	std::cout << "\nWindow (" << window.width << "px x " << window.height << "px) created" << std::endl;
-	std::cout << "Monitor: " << glfwGetMonitorName(window.monitor) << " - Resolution (" << window.screen_resolution_width << "x" << window.screen_resolution_height << ")\n" << std::endl;
+	// Initialize GLAD to get access to OpenGL functions
+	//   - while GLFW is used to create a window, 
+	//      another initialization is needed to get access to the correct OpenGL version.
+	//      We use the library GLAD to get the correct OpenGL functions.
+	const int glad_init_value = gladLoadGL();
+	if (glad_init_value == 0) {
+		std::cout << "Failed to Init GLAD" << std::endl;
+		abort();
+	}
 
 	// Display debug information on command line
-	std::cout << "OpenGL Information:" << std::endl;
-	std::cout << cgp::opengl_info_display() << std::endl;
-
-	// Initialize ImGUI
-	// ***************************************************** //
-	cgp::imgui_init(window.glfw_window);
-
-	// Set the callback functions for the inputs
-	glfwSetMouseButtonCallback(window.glfw_window, mouse_click_callback); // Event called when a button of the mouse is clicked/released
-	glfwSetCursorPosCallback(window.glfw_window, mouse_move_callback);    // Event called when the mouse is moved
-	glfwSetWindowSizeCallback(window.glfw_window, window_size_callback);  // Event called when the window is rescaled        
-	glfwSetKeyCallback(window.glfw_window, keyboard_callback);            // Event called when a keyboard touch is pressed/released
-	glfwSetScrollCallback(window.glfw_window, mouse_scroll_callback);     // Event called when scrolling the mouse
+	std::cout << "\nDebug information on OpenGL version" << std::endl;
+	std::cout << "\t[VENDOR]      : " << glGetString(GL_VENDOR) << std::endl;
+	std::cout << "\t[RENDERDER]   : " << glGetString(GL_RENDERER) << std::endl;
+	std::cout << "\t[VERSION]     : " << glGetString(GL_VERSION) << std::endl;
+	std::cout << "\t[GLSL VERSION]: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
 	return window;
 }
 
-
-
-
-// This function is called everytime the window is resized
-void window_size_callback(GLFWwindow*, int width, int height)
+void glfw_error_callback(int error, const char* description)
 {
-	scene.window.width = width;
-	scene.window.height = height;
+	std::cerr << "Received GLFW error" << std::endl;
+	std::cerr << "\t Error " << " (" << error << ")" << std::endl;
+	std::cerr << "\t Description - " << description << std::endl;
 }
-
-// This function is called everytime the mouse is moved
-void mouse_move_callback(GLFWwindow* /*window*/, double xpos, double ypos)
-{
-	vec2 const pos_relative = scene.window.convert_pixel_to_relative_coordinates({ xpos, ypos });
-	scene.inputs.mouse.position.update(pos_relative);
-	scene.mouse_move_event();
-}
-
-// This function is called everytime a mouse button is clicked/released
-void mouse_click_callback(GLFWwindow* window, int button, int action, int mods)
-{
-	ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-	
-	scene.inputs.mouse.click.update_from_glfw_click(button, action);
-	scene.mouse_click_event();
-}
-
-// This function is called everytime the mouse is scrolled
-void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
-
-	scene.inputs.mouse.scroll = yoffset;
-	scene.mouse_scroll_event();
-}
-
-// This function is called everytime a keyboard touch is pressed/released
-void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-	bool imgui_capture_keyboard = ImGui::GetIO().WantCaptureKeyboard;
-	
-	if(!imgui_capture_keyboard){
-		scene.inputs.keyboard.update_from_glfw_key(key, action);
-		scene.keyboard_event();
-
-		// Press 'F' for full screen mode
-		if (key == GLFW_KEY_F && action == GLFW_PRESS && scene.inputs.keyboard.shift) {
-			scene.window.is_full_screen = !scene.window.is_full_screen;
-			if (scene.window.is_full_screen)
-				scene.window.set_full_screen();
-			else
-				scene.window.set_windowed_screen();
-		}
-		// Press 'V' for camera frame/view matrix debug
-		if (key == GLFW_KEY_V && action == GLFW_PRESS && scene.inputs.keyboard.shift) {
-			auto const camera_model = scene.camera_control.camera_model;
-			std::cout << "\nDebug camera (position = " << str(camera_model.position()) << "):\n" << std::endl;
-			std::cout << "  Frame matrix:" << std::endl;
-			std::cout << str_pretty(camera_model.matrix_frame()) << std::endl;
-			std::cout << "  View matrix:" << std::endl;
-			std::cout << str_pretty(camera_model.matrix_view()) << std::endl;
-
-		}
-	}
-
-}
-
-
-
