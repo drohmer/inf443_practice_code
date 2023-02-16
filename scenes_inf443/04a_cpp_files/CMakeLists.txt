@@ -1,9 +1,9 @@
 # This is a generic CMake setup for CGP library use
 cmake_minimum_required(VERSION 3.8) 
-project(01_basic_cpp)
+project(cpp_files)
 
 file(GLOB_RECURSE src_files src/*.[ch]pp)
-add_executable(01_basic_cpp ${src_files})
+add_executable(cpp_files ${src_files})
 
 
 # Set Compiler for Unix system
@@ -18,9 +18,9 @@ endif()
 # Set Compiler for Windows/Visual Studio
 if(MSVC)
    set(CMAKE_CONFIGURATION_TYPES RelWithDebInfo ) # default build as RelWithDebInfo
-   set_property( DIRECTORY PROPERTY VS_STARTUP_PROJECT 01_basic_cpp ) # default project (avoids AllBuild)
-   set_target_properties( 01_basic_cpp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}$<0:> ) # default output in root dir
-   set_target_properties( 01_basic_cpp PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} ) # default debug execution in root dir
+   set_property( DIRECTORY PROPERTY VS_STARTUP_PROJECT cpp_files ) # default project (avoids AllBuild)
+   set_target_properties( cpp_files PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}$<0:> ) # default output in root dir
+   set_target_properties( cpp_files PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} ) # default debug execution in root dir
    
    # Avoids the warning /W3 overided by /W4 when using Ninja
    if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")

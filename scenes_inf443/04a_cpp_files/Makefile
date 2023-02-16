@@ -1,7 +1,7 @@
-# This Makefile will generate an executable file named b_shading_opengl
+# This Makefile will generate an executable file named cpp_files
 
 
-TARGET ?= b_shading_opengl #name of the executable
+TARGET ?= cpp_files #name of the executable
 SRC_DIRS ?= src/ 
 CXX = g++ #Or clang++
 

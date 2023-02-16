@@ -1,11 +1,11 @@
-all: 01_basic_cpp
+all: cpp_bases
 
-01_basic_cpp: main.o
-	g++ main.o -o 01_basic_cpp
+cpp_bases: main.o
+	g++ main.o -o cpp_bases
 
 main.o: src/main.cpp
 	g++ -c src/main.cpp -o main.o
 
 .PHONY: clean
 clean:
-	rm -f main.o 01_basic_cpp
+	rm -f main.o cpp_bases

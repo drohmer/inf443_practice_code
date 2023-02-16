@@ -53,8 +53,7 @@ void scene_structure::initialize()
 		{ -L_ground,  L_ground, z_ground });
 	ground.initialize_data_on_gpu(ground_mesh);
 	ground.texture.load_and_initialize_texture_2d_on_gpu(project::path+"assets/checkboard.png");
-
-	project::gui_scale = 1.0f;
+	project::gui_scale = 1.5f;
 
 
 	std::cout << "End function scene_structure::initialize()" << std::endl;
