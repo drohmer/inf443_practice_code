@@ -54,7 +54,7 @@ More details are provided in the dedicated [Installation setup and Compilation p
 
 ## Requirement
 
-The code requires the GLFW library in Linux and Mac.
+The code requires the GLFW library in Linux.
 
 ex. on Ubuntu
 
