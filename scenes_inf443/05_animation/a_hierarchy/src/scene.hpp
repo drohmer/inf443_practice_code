@@ -42,7 +42,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// ****************************** //
 
 	// Timer used for the animation
-	cgp::timer_basic timer;
+	timer_basic timer;
 
 	// The entire hierarchy
 	cgp::hierarchy_mesh_drawable hierarchy;
