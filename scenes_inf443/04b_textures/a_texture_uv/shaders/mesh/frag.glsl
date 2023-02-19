@@ -1,4 +1,4 @@
-#version 330 core // Header for OpenGL 3.3
+#version 330 core 
 
 // Fragment shader - this code is executed for every pixel/fragment that belongs to a displayed shape
 //
