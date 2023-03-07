@@ -2,22 +2,22 @@
 
 using namespace cgp;
 
-void keyframe_structure::initialize(buffer<vec3> const& key_positions_arg, buffer<float> const& key_times_arg)
+void keyframe_structure::initialize(numarray<vec3> const& key_positions_arg, numarray<float> const& key_times_arg)
 {
 	key_positions = key_positions_arg;
 	key_times = key_times_arg;
 
 	// Initialise the mesh_drawable
-	sphere_key_positions.initialize(mesh_primitive_sphere(0.05f), "Sphere keyframe");
-	sphere_current.initialize(mesh_primitive_sphere(0.06f), "Sphere current");
-	sphere_key_positions.shading.color = { 1,1,1 };
-	sphere_current.shading.color = { 0,0,1 };
+	sphere_key_positions.initialize_data_on_gpu(mesh_primitive_sphere(0.05f));
+	sphere_current.initialize_data_on_gpu(mesh_primitive_sphere(0.06f));
+	sphere_key_positions.material.color = { 1,1,1 };
+	sphere_current.material.color = { 0,0,1 };
 
-	polygon_key_positions.initialize(key_positions);
+	polygon_key_positions.initialize_data_on_gpu(key_positions);
 	polygon_key_positions.color = { 1,0,0 };
 }
 
-void keyframe_structure::display_key_positions(environmentType const& environment)
+void keyframe_structure::display_key_positions(environment_structure const& environment)
 {
 	assert_cgp(key_times.size() == key_positions.size(), "key_time and key_positions should have the same size");
 
@@ -27,10 +27,10 @@ void keyframe_structure::display_key_positions(environmentType const& environmen
 		int N = key_positions.size();
 		for (int k = 0; k < N; ++k) {
 			if (picking.active && picking.index == k)
-				sphere_key_positions.shading.color = { 1,0,0 };
+				sphere_key_positions.material.color = { 1,0,0 };
 			else
-				sphere_key_positions.shading.color = { 1,1,1 };
-			sphere_key_positions.transform.translation = key_positions[k];
+				sphere_key_positions.material.color = { 1,1,1 };
+			sphere_key_positions.model.translation = key_positions[k];
 			draw(sphere_key_positions, environment);
 		}
 	}
@@ -38,26 +38,26 @@ void keyframe_structure::display_key_positions(environmentType const& environmen
 
 	// Display the polygon linking the key positions
 	if (picking.active)
-		polygon_key_positions.update(key_positions); // update the polygon if needed
+		polygon_key_positions.vbo_position.update(key_positions); // update the polygon if needed
 	if (display_polygon)
 		draw(polygon_key_positions, environment);
 
 }
 
-void keyframe_structure::display_current_position(vec3 const& p, environmentType& environment)
+void keyframe_structure::display_current_position(vec3 const& p, environment_structure& environment)
 {
 	// Display the interpolated position
-	sphere_current.transform.translation = p;
+	sphere_current.model.translation = p;
 	draw(sphere_current, environment);
 
 	// Display the trajectory
 	trajectory.visual.color = { 0,0,1 };
-	trajectory.add(p, 0 /*arbitrary time*/);
+	trajectory.add(p);
 	if (display_trajectory)
 		draw(trajectory, environment);
 }
 
-void keyframe_structure::update_picking(inputs_interaction_parameters const& inputs, environmentType& environment)
+void keyframe_structure::update_picking(input_devices const& inputs, camera_generic_base const& camera, camera_projection_perspective const& projection)
 {
 	// Current position of the mouse
 	vec2 const& p = inputs.mouse.position.current;
@@ -67,12 +67,12 @@ void keyframe_structure::update_picking(inputs_interaction_parameters const& inp
 	{
 		// If the mouse is not clicked, compute a picking on the vertices of the grid
 		if (!inputs.mouse.click.left)
-			picking = picking_spheres(p, key_positions, 0.05f, environment.camera, environment.projection);
+			picking = picking_spheres(p, key_positions, 0.05f, camera, projection);
 
 		// Key position translation
 		if (inputs.mouse.click.left && picking.active)
 		{
-			vec3 new_position = picking_plane_orthogonal_to_camera(p, picking.position, environment.camera, environment.projection).position;
+			vec3 new_position = picking_plane_orthogonal_to_camera(p, picking.position, camera, projection).position;
 			key_positions[picking.index] = new_position;
 		}
 	}

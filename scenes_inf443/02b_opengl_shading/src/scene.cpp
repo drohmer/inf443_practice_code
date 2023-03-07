@@ -67,8 +67,8 @@ void scene_structure::initialize()
 	// Load the custom shader
 	opengl_shader_structure shader_custom;
 	shader_custom.load(
-		project::path + "shaders/shading_custom/vert.glsl",
-		project::path + "shaders/shading_custom/frag.glsl");
+		project::path + "shaders/shading_custom/shading_custom.vert.glsl",
+		project::path + "shaders/shading_custom/shading_custom.frag.glsl");
 
 	// Affect the loaded shader to the mesh_drawable
 	camel.shader = shader_custom;

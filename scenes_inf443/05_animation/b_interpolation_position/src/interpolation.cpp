@@ -13,10 +13,10 @@ vec3 cardinal_spline_interpolation(float t, float t0, float t1, float t2, float 
 /** Find the index k such that intervals[k] < t < intervals[k+1] 
 * - Assume intervals is a sorted array of N time values
 * - Assume t \in [ intervals[0], intervals[N-1] [       */
-int find_index_of_interval(float t, buffer<float> const& intervals);
+int find_index_of_interval(float t, numarray<float> const& intervals);
 
 
-vec3 interpolation(float t, buffer<vec3> const& key_positions, buffer<float> const& key_times)
+vec3 interpolation(float t, numarray<vec3> const& key_positions, numarray<float> const& key_times)
 {
     // Find idx such that key_times[idx] < t < key_times[idx+1]
     int idx = find_index_of_interval(t, key_times);
@@ -66,7 +66,7 @@ vec3 cardinal_spline_interpolation(float t, float t0, float t1, float t2, float 
     return p;
 }
 
-int find_index_of_interval(float t, buffer<float> const& intervals)
+int find_index_of_interval(float t, numarray<float> const& intervals)
 {
     int const N = intervals.size();
     bool error = false;

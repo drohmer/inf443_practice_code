@@ -2,7 +2,17 @@
 
 
 #include "cgp/cgp.hpp"
+#include "environment.hpp"
 #include "key_positions_structure.hpp"
+
+
+// This definitions allow to use the structures: mesh, mesh_drawable, etc. without mentionning explicitly cgp::
+using cgp::mesh;
+using cgp::mesh_drawable;
+using cgp::vec3;
+using cgp::numarray;
+using cgp::timer_basic;
+
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
@@ -12,18 +22,25 @@ struct gui_parameters {
 
 
 // The structure of the custom scene
-struct scene_structure {
-	
+struct scene_structure : cgp::scene_inputs_generic {
+
 	// ****************************** //
 	// Elements and shapes of the scene
 	// ****************************** //
 
-	cgp::mesh_drawable global_frame;          // The standard global frame
-	cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
-	cgp::inputs_interaction_parameters inputs; // Storage for inputs status (mouse, keyboard, window dimension)
+	camera_controller_orbit_euler camera_control;
+	camera_projection_perspective camera_projection;
+	window_structure window;
 
-	gui_parameters gui;                        // Standard GUI element storage
+	mesh_drawable global_frame;          // The standard global frame
+	environment_structure environment;   // Standard environment controler
+	input_devices inputs;                // Storage for inputs status (mouse, keyboard, window dimension)
+	gui_parameters gui;                  // Standard GUI element storage
 
+
+	// ****************************** //
+	// Elements and shapes of the scene
+	// ****************************** //
 
 	// A helper structure used to store and display the key positions/time
 	keyframe_structure keyframe;
@@ -36,12 +53,14 @@ struct scene_structure {
 	// Functions
 	// ****************************** //
 
-	void initialize();  // Standard initialization to be called before the animation loop
-	void display();     // The frame display to be called within the animation loop
-	void display_gui(); // The display of the GUI, also called within the animation loop
+	void initialize();    // Standard initialization to be called before the animation loop
+	void display_frame(); // The frame display to be called within the animation loop
+	void display_gui();   // The display of the GUI, also called within the animation loop
 
-	//void display_key_positions();
-	void mouse_move(); //drag of the vertices implemented during the mouse motion
+	void mouse_move_event();
+	void mouse_click_event();
+	void keyboard_event();
+	void idle_frame();
 };
 
 

@@ -1,5 +1,4 @@
-#version 300 es // Compatible with OpenGL ES
-precision mediump float;
+#version 330 core
 
 layout (location = 0) in vec3 position;
 

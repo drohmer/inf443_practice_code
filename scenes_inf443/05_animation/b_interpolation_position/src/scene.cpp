@@ -9,21 +9,22 @@ void scene_structure::initialize()
 {
 	// Basic set-up
 	// ***************************************** //
+	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
+	camera_control.set_rotation_axis_z();
+	camera_control.look_at({ 2.0f,-2.0f,1.0f }, { 0,0,0 });
 
-	global_frame.initialize(mesh_primitive_frame(), "Frame");
-	environment.camera.axis = camera_spherical_coordinates_axis::z;
-	environment.camera.look_at({ 0.0f,-2.0f,3.0f }, { 0,0,0 });
+	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 
 	// Definition of the initial data
 	//--------------------------------------//
 
 	// Key 3D positions
-	buffer<vec3> key_positions = 
+	numarray<vec3> key_positions = 
 	{ {-1,1,0}, {0,1,0}, {1,1,0}, {1,2,0}, {2,2,0}, {2,2,1}, {2,0,1.5}, {1.5,-1,1}, {1.5,-1,0}, {1,-1,0}, {0,-0.5,0}, {-1,-0.5,0} };
 
 	// Key times (time at which the position must pass in the corresponding position)
-	buffer<float> key_times = 
+	numarray<float> key_times = 
 	{ 0.0f, 1.0f, 2.0f, 2.5f, 3.0f, 3.5f, 3.75f, 4.5f, 5.0f, 6.0f, 7.0f, 8.0f };
 
 	// Initialize the helping structure to display/interact with these positions
@@ -44,10 +45,10 @@ void scene_structure::initialize()
 
 
 
-void scene_structure::display()
+void scene_structure::display_frame()
 {
 	// Basic elements of the scene
-	environment.light = environment.camera.position();
+	environment.light = camera_control.camera_model.position();
 	if (gui.display_frame)
 		draw(global_frame, environment);
 
@@ -84,8 +85,23 @@ void scene_structure::display_gui()
 	keyframe.display_gui();
 }
 
-void scene_structure::mouse_move()
+void scene_structure::mouse_move_event()
 {
+	if (!inputs.keyboard.shift)
+		camera_control.action_mouse_move(environment.camera_view);
+
 	// Handle the picking (displacement of the position using mouse drag)
-	keyframe.update_picking(inputs, environment);
+	keyframe.update_picking(inputs, camera_control.camera_model, camera_projection);
+}
+void scene_structure::mouse_click_event()
+{
+	camera_control.action_mouse_click(environment.camera_view);
+}
+void scene_structure::keyboard_event()
+{
+	camera_control.action_keyboard(environment.camera_view);
+}
+void scene_structure::idle_frame()
+{
+	camera_control.idle_frame(environment.camera_view);
 }
