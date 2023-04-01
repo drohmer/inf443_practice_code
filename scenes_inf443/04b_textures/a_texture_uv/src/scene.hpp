@@ -1,5 +1,6 @@
 #pragma once
 
+#undef SOLUTION
 
 #include "cgp/cgp.hpp"
 #include "environment.hpp"

@@ -42,6 +42,7 @@ void scene_structure::initialize()
 	cylinder1.material.color = color1;
 	cylinder1_son.material.color = color1;
 
+
 	// Add the elements in the hierarchy
 	//   The syntax is hierarchy.add(mesh_drawable, "name of the parent element", [optional: local translation in the hierarchy])
 	//   Notes: 
@@ -83,6 +84,7 @@ void scene_structure::display_frame()
 	draw(hierarchy, environment);
 	if (gui.display_wireframe)
 		draw_wireframe(hierarchy, environment);
+
 }
 
 
