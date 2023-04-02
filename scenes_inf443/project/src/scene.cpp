@@ -3,7 +3,22 @@
 
 using namespace cgp;
 
+void deform_terrain(mesh& m)
+{
+	// Set the terrain to have a gaussian shape
+	for (int k = 0; k < m.position.size(); ++k)
+	{
+		vec3& p = m.position[k];
+		float d2 = p.x*p.x + p.y * p.y;
+		float z = exp(-d2 / 4)-1;
 
+		z = z + 0.05f*noise_perlin({ p.x,p.y });
+
+		p = { p.x, p.y, z };
+	}
+
+	m.normal_update();
+}
 
 // This function is called only once at the beginning of the program
 // This function can contain any complex operation that can be pre-computed once
@@ -17,7 +32,7 @@ void scene_structure::initialize()
 	camera_control.set_rotation_axis_z(); // camera rotates around z-axis
 	//   look_at(camera_position, targeted_point, up_direction)
 	camera_control.look_at(
-		{ 3.0f, -2.0f, 1.5f } /* position of the camera in the 3D scene */,
+		{ 5.0f, -4.0f, 3.5f } /* position of the camera in the 3D scene */,
 		{0,0,0} /* targeted point in 3D scene */,
 		{0,0,1} /* direction of the "up" vector */);
 
@@ -28,35 +43,28 @@ void scene_structure::initialize()
 
 	// Create the shapes seen in the 3D scene
 	// ********************************************** //
-	
-	// Create a mesh structure (here a cube)
-	mesh cube_mesh = mesh_primitive_cube(/*center*/{ 0,0,0 }, /*edge length*/ 1.0f);
-	// a mesh is simply a container of vertex data (position,normal,color,uv) and triangle index
-	// the mesh data are stored on the CPU memory - they will need to be sent to the GPU memory before being drawn
 
-	// Initialize a mesh drawable from a mesh structure
-	//   - mesh : store buffer of data (vertices, indices, etc) on the CPU. The mesh structure is convenient to manipulate in the C++ code but cannot be displayed (data is not on GPU).
-	//   - mesh_drawable : store VBO associated to elements on the GPU + associated uniform parameters. A mesh_drawable can be displayed using the function draw(mesh_drawable, environment). It only stores the indices of the buffers on the GPU - the buffer of data cannot be directly accessed in the C++ code through a mesh_drawable.
-	//   Note: a mesh_drawable can be created from a mesh structure in calling [mesh_drawable_name].initialize_data_on_gpu([mesh_name])
-	cube.initialize_data_on_gpu(cube_mesh);
-	cube.material.color = { 1,1,0 };  // set the color of the cube (R,G,B) - sent as uniform parameter to the shader when display is called.
-	cube.model.translation = { 1,1,0 }; // set the position of the cube - translation applied as uniform parameter to the "model matrix" in the shader when display is called.
+	float L = 5.0f;
+	mesh terrain_mesh = mesh_primitive_grid({ -L,-L,0 }, { L,-L,0 }, { L,L,0 }, { -L,L,0 }, 100, 100);
+	deform_terrain(terrain_mesh);
+	terrain.initialize_data_on_gpu(terrain_mesh);
+	terrain.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/sand.jpg");
 
-	// Same process for the ground which is a plane 
-	//  A quadrangle is defined a plane with 4-extremal corners.
-	float L_ground = 3.0f;
-	float z_ground = -0.51f;
-	mesh ground_mesh = mesh_primitive_quadrangle(
-		{ -L_ground, -L_ground, z_ground },
-		{  L_ground, -L_ground, z_ground },
-		{  L_ground,  L_ground, z_ground },
-		{ -L_ground,  L_ground, z_ground });
-	ground.initialize_data_on_gpu(ground_mesh);
-	ground.texture.load_and_initialize_texture_2d_on_gpu(project::path+"assets/checkboard.png");
-	project::gui_scale = 1.5f;
+	float sea_w = 8.0;
+	float sea_z = -0.8f;
+	water.initialize_data_on_gpu(mesh_primitive_grid({ -sea_w,-sea_w,sea_z }, { sea_w,-sea_w,sea_z }, { sea_w,sea_w,sea_z }, { -sea_w,sea_w,sea_z }));
+	water.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/sea.png");
 
+	tree.initialize_data_on_gpu(mesh_load_file_obj(project::path + "assets/palm_tree/palm_tree.obj"));
+	tree.model.rotation = rotation_transform::from_axis_angle({ 1,0,0 }, Pi / 2.0f);
+	tree.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/palm_tree/palm_tree.jpg", GL_REPEAT, GL_REPEAT);
 
-	std::cout << "End function scene_structure::initialize()" << std::endl;
+	cube1.initialize_data_on_gpu(mesh_primitive_cube({ 0,0,0 }, 0.5f));
+	cube1.model.rotation = rotation_transform::from_axis_angle({ -1,1,0 }, Pi / 7.0f);
+	cube1.model.translation = { 1.0f,1.0f,-0.1f };
+	cube1.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/wood.jpg");
+
+	cube2 = cube1;
 
 }
 
@@ -66,23 +74,39 @@ void scene_structure::initialize()
 void scene_structure::display_frame()
 {
 
-
 	// Set the light to the current position of the camera
 	environment.light = camera_control.camera_model.position();
 
 	// Update time
 	timer.update();
-	
-	// the general syntax to display a mesh is:
-	//   draw(mesh_drawableName, environment);
-	// Note: scene is used to set the uniform parameters associated to the camera, light, etc. to the shader
-	draw(ground, environment);
-	draw(cube, environment);	
-
 
 	// conditional display of the global frame (set via the GUI)
 	if (gui.display_frame)
 		draw(global_frame, environment);
+	
+
+	// Draw all the shapes
+	draw(terrain, environment);
+	draw(water, environment);
+	draw(tree, environment);
+	draw(cube1, environment);
+
+	// Animate the second cube in the water
+	cube2.model.translation = { -1.0f, 6.0f+0.1*sin(0.5f*timer.t), -0.8f + 0.1f * cos(0.5f * timer.t)};
+	cube2.model.rotation = rotation_transform::from_axis_angle({1,-0.2,0},Pi/12.0f*sin(0.5f*timer.t));
+	draw(cube2, environment);
+
+	if (gui.display_wireframe) {
+		draw_wireframe(terrain, environment);
+		draw_wireframe(water, environment);
+		draw_wireframe(tree, environment);
+		draw_wireframe(cube1, environment);
+		draw_wireframe(cube2, environment);
+	}
+	
+
+
+
 
 
 
@@ -92,6 +116,8 @@ void scene_structure::display_frame()
 void scene_structure::display_gui()
 {
 	ImGui::Checkbox("Frame", &gui.display_frame);
+	ImGui::Checkbox("Wireframe", &gui.display_wireframe);
+
 }
 
 void scene_structure::mouse_move_event()
