@@ -61,6 +61,8 @@ struct scene_structure : cgp::scene_inputs_generic {
 	void mouse_click_event();
 	void keyboard_event();
 	void idle_frame();
+
+	void display_info();
 };
 
 

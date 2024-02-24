@@ -13,8 +13,12 @@ void scene_structure::initialize()
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
 	camera_control.set_rotation_axis_z();
 	camera_control.look_at({ 15.0f,6.0f,6.0f }, {0,0,0});
-	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
+	
 
+	// General information
+	display_info();
+
+	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 	int N_terrain_samples = 100;
 	float terrain_length = 20;
@@ -66,3 +70,10 @@ void scene_structure::idle_frame()
 	camera_control.idle_frame(environment.camera_view);
 }
 
+void scene_structure::display_info()
+{
+	std::cout << "\nCAMERA CONTROL:" << std::endl;
+	std::cout << "-----------------------------------------------" << std::endl;
+	std::cout << camera_control.doc_usage() << std::endl;
+	std::cout << "-----------------------------------------------\n" << std::endl;
+}

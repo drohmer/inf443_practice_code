@@ -22,6 +22,7 @@ void scene_structure::initialize()
 		{0,0,0} /* targeted point in 3D scene */,
 		{0,0,1} /* direction of the "up" vector */);
 
+	display_info();
 
 	// Create the global (x,y,z) frame
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
@@ -156,3 +157,16 @@ void scene_structure::idle_frame()
 	camera_control.idle_frame(environment.camera_view);
 }
 
+void scene_structure::display_info()
+{
+	std::cout << "\nCAMERA CONTROL:" << std::endl;
+	std::cout << "-----------------------------------------------" << std::endl;
+	std::cout << camera_control.doc_usage() << std::endl;
+	std::cout << "-----------------------------------------------\n" << std::endl;
+
+
+	std::cout << "\nSCENE INFO:" << std::endl;
+	std::cout << "-----------------------------------------------" << std::endl;
+	std::cout << "Exercise on Shading on GPU." << std::endl;
+	std::cout << "-----------------------------------------------\n" << std::endl;
+}

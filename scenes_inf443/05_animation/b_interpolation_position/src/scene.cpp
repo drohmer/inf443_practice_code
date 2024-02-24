@@ -13,6 +13,7 @@ void scene_structure::initialize()
 	camera_control.set_rotation_axis_z();
 	camera_control.look_at({ 2.0f,-2.0f,1.0f }, { 0,0,0 });
 
+	display_info();
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 
@@ -104,4 +105,12 @@ void scene_structure::keyboard_event()
 void scene_structure::idle_frame()
 {
 	camera_control.idle_frame(environment.camera_view);
+}
+
+void scene_structure::display_info()
+{
+	std::cout << "\nCAMERA CONTROL:" << std::endl;
+	std::cout << "-----------------------------------------------" << std::endl;
+	std::cout << camera_control.doc_usage() << std::endl;
+	std::cout << "-----------------------------------------------\n" << std::endl;
 }

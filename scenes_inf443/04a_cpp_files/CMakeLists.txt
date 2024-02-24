@@ -13,7 +13,7 @@ if(UNIX)
    add_definitions(-Wno-sign-compare -Wno-type-limits) # Remove some warnings
 endif()
 
- 
+add_definitions(-DSOLUTION)
 
 # Set Compiler for Windows/Visual Studio
 if(MSVC)

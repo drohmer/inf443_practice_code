@@ -22,6 +22,9 @@ void scene_structure::initialize()
 		{0,0,1} /* direction of the "up" vector */);
 
 
+	// General information
+	display_info();
+
 	// Create the global (x,y,z) frame
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
@@ -55,6 +58,8 @@ void scene_structure::initialize()
 	ground.texture.load_and_initialize_texture_2d_on_gpu(project::path+"assets/checkboard.png");
 	project::gui_scale = 1.5f;
 
+
+	
 
 	std::cout << "End function scene_structure::initialize()" << std::endl;
 
@@ -110,5 +115,19 @@ void scene_structure::keyboard_event()
 void scene_structure::idle_frame()
 {
 	camera_control.idle_frame(environment.camera_view);
+}
+
+void scene_structure::display_info()
+{
+	std::cout << "\nCAMERA CONTROL:" << std::endl;
+	std::cout << "-----------------------------------------------" << std::endl;
+	std::cout << camera_control.doc_usage() << std::endl;
+	std::cout << "-----------------------------------------------\n" << std::endl;
+
+
+	std::cout << "\nSCENE INFO:" << std::endl;
+	std::cout << "-----------------------------------------------" << std::endl;
+	std::cout << "Introductory scene for INF443." << std::endl;
+	std::cout << "-----------------------------------------------\n" << std::endl;
 }
 

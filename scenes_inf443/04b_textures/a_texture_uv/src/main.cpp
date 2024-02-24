@@ -4,7 +4,8 @@
 #include "environment.hpp" // The general scene environment + project variable
 #include <iostream> 
 
-
+#include <chrono>
+#include <thread>
 
 // Custom scene of this code
 #include "scene.hpp"
@@ -24,9 +25,10 @@ scene_structure scene;
 // Start of the program
 // *************************** //
 
-window_structure standard_window_initialization(int width = 0, int height = 0);
+window_structure standard_window_initialization();
 void initialize_default_shaders();
 void animation_loop();
+void display_gui_default();
 
 timer_fps fps_record;
 
@@ -39,11 +41,11 @@ int main(int, char* argv[])
 	// ************************ //
 	//     INITIALISATION
 	// ************************ //
-
+	
 	// Standard Initialization of an OpenGL ready window
 	scene.window = standard_window_initialization();
 
-	// Initialize System Info
+	// Initialize default path for assets
 	project::path = cgp::project_path_find(argv[0], "shaders/");
 
 	// Initialize default shaders
@@ -67,9 +69,17 @@ int main(int, char* argv[])
 	//  The following part is simply a loop that call the function "animation_loop"
 	//  (This call is different when we compile in standard mode with GLFW, than when we compile with emscripten to output the result in a webpage.)
 #ifndef __EMSCRIPTEN__
+    double lasttime = glfwGetTime();
 	// Default mode to run the animation/display loop with GLFW in C++
 	while (!glfwWindowShouldClose(scene.window.glfw_window)) {
+		// The real animation loop
 		animation_loop();
+
+		// FPS limitation
+		if(project::fps_limiting){
+			while (glfwGetTime() < lasttime + 1.0 / project::fps_max) {	}
+        	lasttime = glfwGetTime();
+		}
 	}
 #else
 	// Specific loop if compiled for EMScripten
@@ -115,6 +125,7 @@ void animation_loop()
 
 
 	// Display the ImGUI interface (button, sliders, etc)
+	display_gui_default();
 	scene.display_gui();
 
 	// Handle camera behavior in standard frame
@@ -163,12 +174,26 @@ void mouse_click_callback(GLFWwindow* window, int button, int action, int mods);
 void keyboard_callback(GLFWwindow* window, int key, int, int action, int mods);
 
 // Standard initialization procedure
-window_structure standard_window_initialization(int width_target, int height_target)
+window_structure standard_window_initialization()
 {
-	// Create the window using GLFW
+	// Initialize GLFW and create window
 	// ***************************************************** //
+
+	// First initialize GLFW
+	scene.window.initialize_glfw();
+
+	// Compute initial window width and height
+	int window_width = int(project::initial_window_size_width);
+	int window_height = int(project::initial_window_size_height);
+	if(project::initial_window_size_width<1)
+		window_width = project::initial_window_size_width * scene.window.monitor_width();
+	if(project::initial_window_size_height<1)
+		window_height = project::initial_window_size_height * scene.window.monitor_height();
+
+	// Create the window using GLFW
 	window_structure window;
-	window.initialize(width_target, height_target, "CGP Display", CGP_OPENGL_VERSION_MAJOR, CGP_OPENGL_VERSION_MINOR);
+	window.create_window(window_width, window_height, "CGP Display", CGP_OPENGL_VERSION_MAJOR, CGP_OPENGL_VERSION_MINOR);
+
 
 	// Display information
 	// ***************************************************** //
@@ -263,5 +288,52 @@ void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, in
 
 }
 
+void display_gui_default()
+{
+	std::string fps_txt = str(fps_record.fps)+" fps";
+
+	if(scene.inputs.keyboard.ctrl)
+		fps_txt += " [ctrl]";
+	if(scene.inputs.keyboard.shift)
+		fps_txt += " [shift]";
+
+	ImGui::Text( fps_txt.c_str(), "%s" );
+	if(ImGui::CollapsingHeader("Window")) {
+		ImGui::Indent();
+#ifndef __EMSCRIPTEN__
+		bool changed_screen_mode = ImGui::Checkbox("Full Screen", &scene.window.is_full_screen);
+		if(changed_screen_mode){	
+			if (scene.window.is_full_screen)
+				scene.window.set_full_screen();
+			else
+				scene.window.set_windowed_screen();
+		}
+#endif
+		ImGui::SliderFloat("Gui Scale", &project::gui_scale, 0.5f, 2.5f);
+
+#ifndef __EMSCRIPTEN__
+		// Arbitrary limits the refresh rate to a maximal frame per seconds.
+		//  This limits the risk of having different behaviors when you use different machine. 
+		ImGui::Checkbox("FPS limiting",&project::fps_limiting);
+		if(project::fps_limiting){
+			ImGui::SliderFloat("FPS limit",&project::fps_max, 10, 250);
+		}
+#endif
+		// vsync is the default synchronization of frame refresh with the screen frequency
+		//   vsync may or may not be enforced by your GPU driver and OS (on top of the GLFW request).
+		//   de-activating vsync may generate arbitrary large FPS depending on your GPU and scene.
+		if(ImGui::Checkbox("vsync (screen sync)",&project::vsync)){
+			project::vsync==true? glfwSwapInterval(1) : glfwSwapInterval(0); 
+		}
+
+		std::string window_size = "Window "+str(scene.window.width)+"px x "+str(scene.window.height)+"px";
+		ImGui::Text( window_size.c_str(), "%s" );
+
+		ImGui::Unindent();
+
+
+		ImGui::Spacing();ImGui::Separator();ImGui::Spacing();
+	}
+}
 
 
