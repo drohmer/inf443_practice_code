@@ -2,9 +2,12 @@
 
 ## Download
 
+_Note: Do not use the "Code -> Download ZIP" option from the GitHub GUI as you won't get the CGP library as submodule with the code._
 
+* [inf443_lab_code.zip](https://imagecomputing.net/course/2023_2024/inf443/lab_code/inf443_lab_code.zip)
+* [inf443_lab_code.tar.gz](https://imagecomputing.net/course/2023_2024/inf443/lab_code/inf443_lab_code.tar.gz)
 
-### Clone
+## Clone
 
 ```
 git clone --recurse-submodules https://github.com/drohmer/inf443_practice_code.git
@@ -19,13 +22,7 @@ git submodule init
 git submodule update
 ```
 
-### Download archive
 
-* [inf443_practice_code.zip](https://imagecomputing.net/damien.rohmer/teaching/inf443/code/inf443_practice_code.zip)
-* [inf443_practice_code.tar.gz](https://imagecomputing.net/damien.rohmer/teaching/inf443/code/inf443_practice_code.tar.gz)
-
-
-_Note: Do not use the "Code -> Download ZIP" option from the GitHub GUI as you won't get the CGP library as submodule with the code._
 
 
 ## Compilation
