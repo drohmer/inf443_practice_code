@@ -63,6 +63,6 @@ sudo apt-get install libglfw3-dev
 
 ## Links
 
-* [Lab class exercises](https://damienrohmer.com/data/teaching/2022_2023/x-inf443/practice/index.html)
+* [Lab class exercises](https://imagecomputing.net/course/2023_2024/inf443/lab)
 * [Documentation on CGP library](https://imagecomputing.net/cgp/index.html)
 
