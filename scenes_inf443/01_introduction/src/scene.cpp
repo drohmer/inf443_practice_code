@@ -59,11 +59,11 @@ void scene_structure::initialize()
 
 
 
-	
 
 	std::cout << "End function scene_structure::initialize()" << std::endl;
 
 }
+
 
 
 // This function is called permanently at every new frame
@@ -89,11 +89,13 @@ void scene_structure::display_frame()
 	if (gui.display_frame)
 		draw(global_frame, environment);
 
+	
 
 
 
 }
 
+/// @brief 
 void scene_structure::display_gui()
 {
 	ImGui::Checkbox("Frame", &gui.display_frame);
@@ -116,6 +118,7 @@ void scene_structure::idle_frame()
 {
 	camera_control.idle_frame(environment.camera_view);
 }
+
 
 void scene_structure::display_info()
 {
