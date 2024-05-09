@@ -13,8 +13,8 @@ void scene_structure::initialize()
 	
 	image_structure image_skybox_template = image_load_file(project::path+"assets/skybox_01.jpg");
 	// Other possibilities:
-	//   image_structure image_skybox_template = image_load_file("assets/skybox_02.jpg");
-	//   image_structure image_skybox_template = image_load_file("assets/skybox_debug.png");
+	//   image_structure image_skybox_template = image_load_file(project::path+"assets/skybox_02.jpg");
+	//   image_structure image_skybox_template = image_load_file(project::path+"assets/skybox_debug.png");
 
 
 	// Split the image into a grid of 4 x 3 sub-images
