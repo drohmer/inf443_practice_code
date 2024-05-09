@@ -54,8 +54,6 @@ void scene_structure::initialize()
 	view_light = camera_control.camera_model.matrix_view();
 	environment.uniform_generic.uniform_mat4["projection_light"] = projection_orthographic(-10.0f, 10.0f, -10.0f, 10.0f, 0.0f, 30.0f);
 
-	//environment.default_expected_uniform = true;
-
 }
 
 
