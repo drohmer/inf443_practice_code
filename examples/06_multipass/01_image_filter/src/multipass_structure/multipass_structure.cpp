@@ -51,7 +51,7 @@ void multipass_structure::start_pass_2(vec3 const background_color) {
 void multipass_structure::draw_pass_2(environment_generic_structure const& environment) 
 {
 	glDisable(GL_DEPTH_TEST);
-	draw(quad_pass_2, environment, false);
+	draw(quad_pass_2, environment, 1, false);
 	glEnable(GL_DEPTH_TEST);
 }
 

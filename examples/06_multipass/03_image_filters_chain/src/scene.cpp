@@ -36,6 +36,8 @@ void scene_structure::initialize()
 	multipass_rendering.set_shader_pass_2(shader_2);
 	multipass_rendering.set_shader_pass_3(shader_3);
 	environment.uniform_generic.uniform_int["thickness"] = 5;
+
+	environment.default_expected_uniform = false;
 }
 
 

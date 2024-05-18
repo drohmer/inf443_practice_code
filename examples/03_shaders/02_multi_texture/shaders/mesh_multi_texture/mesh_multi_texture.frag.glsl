@@ -121,7 +121,7 @@ void main()
 
 	// Blend the crack texture with a white image along the y direction
 	float blending_parameter = fragment.uv.y;
-	color_image_texture_2 = blending_parameter * vec4(1, 1, 1, 1) + (1 - blending_parameter) * color_image_texture_2;
+	color_image_texture_2 = blending_parameter * vec4(1.0, 1.0, 1.0, 1.0) + (1.0 - blending_parameter) * color_image_texture_2;
 
 	// Finally multiply the color of the two textures
 	color_image_texture = color_image_texture * color_image_texture_2;

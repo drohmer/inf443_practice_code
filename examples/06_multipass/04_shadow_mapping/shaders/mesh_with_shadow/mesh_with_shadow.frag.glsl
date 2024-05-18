@@ -75,7 +75,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 L, vec3 N)
 
     float bias = max(0.002 * (1.0 - dot(N, L)), 0.005);//0.005;
     float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(depth_map_texture, 0);
+    vec2 texelSize = vec2(1.0 / float(textureSize(depth_map_texture, 0).x), 1.0 / float(textureSize(depth_map_texture, 0).y));
     for(int x = -2; x <= 2; ++x)
     {
         for(int y = -2; y <= 2; ++y)

@@ -40,7 +40,7 @@ mat3 rotation_z(in float angle) {
 // Random noise - https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
 float PHI = 1.61803398874989484820459;
 float gold_noise(in vec2 xy, in float seed) {return fract(tan(distance(xy * PHI, xy) * seed) * xy.x);}
-float rand(in float n) { return gold_noise(vec2(n,n+0.5), 1); }
+float rand(in float n) { return gold_noise(vec2(n,n+0.5), 1.0); }
 
 // Procedural wind-like deformation
 vec3 wind(in vec3 p,in float t) {
@@ -51,10 +51,10 @@ vec3 wind(in vec3 p,in float t) {
 void main()
 {
 	// generate a random rotation based on the index of the current instance index (gl_InstanceID)
-	mat3 rotation_instance = rotation_z(rand(gl_InstanceID*50.0+10) * 3.14);
+	mat3 rotation_instance = rotation_z(rand(float(gl_InstanceID)*50.0+10.0) * 3.14);
 
 	// Create a procedural offset to place the place of grass based on the current instance index
-	vec3 offset = scaling_grass * vec3( (rand(gl_InstanceID)-0.5) * 20.0, rand(gl_InstanceID + 1) * 20.0 - 6.0, 0.0);
+	vec3 offset = scaling_grass * vec3( rand(float(gl_InstanceID)-0.5) * 20.0, rand(float(gl_InstanceID) + 1.0) * 20.0 - 6.0, 0.0);
 
 
 	// The position of the vertex in the world space

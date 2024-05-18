@@ -35,6 +35,8 @@ void scene_structure::initialize()
 	opengl_shader_structure shader_environment_map;
 	shader_environment_map.load(project::path + "shaders/environment_map/environment_map.vert.glsl", project::path + "shaders/environment_map/environment_map.frag.glsl");
 
+	environment.uniform_generic.uniform_mat3["skybox_rotation"] = mat3::build_identity();
+	environment.default_expected_uniform = false;
 	for (auto& shape_it : shapes) {
 		mesh_drawable& shape = shape_it.second;
 		shape.shader = shader_environment_map;

@@ -28,6 +28,7 @@ void scene_structure::initialize()
 	multipass_rendering.initialize();
 	multipass_rendering.set_shader_pass_2(shader_effect);
 
+
 }
 
 

@@ -26,6 +26,8 @@ void scene_structure::initialize()
 
 	// Init default scene
 	scene_elements.initialize();
+
+	environment.default_expected_uniform = false;
 }
 
 

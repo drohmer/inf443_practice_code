@@ -16,7 +16,7 @@ vec2 deformation(in vec2 uv, in float sigma, in float wavelength, in float frequ
 	float dist = length(p);
 
 	// Compute weight varying as an increasing & oscillating function of the distance
-	float alpha = (dist / sigma) * (dist / sigma) * cos(2*3.14* (dist/wavelength - frequency * time) );
+	float alpha = (dist / sigma) * (dist / sigma) * cos(2.0*3.14* (dist/wavelength - frequency * time) );
 
 	// The deformation offset is aligned with a vector pointing outward of the center
 	vec2 u = p / length(p); // unit vector going away of the center 

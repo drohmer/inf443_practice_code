@@ -33,5 +33,5 @@ void main()
 
 	vec4 base = texture(image_texture, uv_frag);
 	float c = length(color);
-	FragColor = base*(1-c)+c*vec4(1,0,0,0);// +abs(1.0 - color);
+	FragColor = base*(1.0-c)+c*vec4(1.0,0.0,0.0,0.0);// +abs(1.0 - color);
 }

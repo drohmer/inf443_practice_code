@@ -64,7 +64,7 @@ uniform material_structure material;
 
 // Image of the skybox
 uniform samplerCube image_skybox;
-uniform mat3 skybox_rotation = mat3(1.0);
+uniform mat3 skybox_rotation;
 
 
 void main()
